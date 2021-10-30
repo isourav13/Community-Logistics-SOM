@@ -14,13 +14,19 @@ import matplotlib.pyplot as plt
 %matplotlib inline
 
 
+############################   Data Loading and Randomizing weight column w.r.t. Sales per person  ##################################
 
 df = pd.read_csv('/Users/isourav/Documents SSD/Assignment/Dissertation/Dataset/Input.csv')
+df['Weight'] = np.random.randint(1, 5, df.shape[0])*df.iloc[:, 1]
+
+
+
+############################   Data Preprocessing - Train 70%, Test 30%  ##################################
+
 rng = RandomState()
 
 train = df.sample(frac=0.7, random_state=rng)
 test = df.loc[~df.index.isin(train.index)]
-
 
 ############################   NumPy Object Scaling for SOM  ##################################
 
@@ -41,9 +47,6 @@ som = MiniSom(som_shape[0], som_shape[1], train_data.shape[1], sigma=.5, learnin
 ############################   TRAIN   ##################################
 
 som.train_batch(train_data, 500, verbose=True)
-
-
-
 
 
 ############################   TEST   ##################################
