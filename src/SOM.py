@@ -16,6 +16,10 @@ import geopandas as gpd
 
 from shapely.geometry import Point, Polygon
 import contextily as cx
+from sklearn import metrics
+from sklearn.metrics import pairwise_distances
+from sklearn.metrics import davies_bouldin_score
+from sklearn.metrics import calinski_harabasz_score
 
 
 ############################   Data Loading and Randomizing weight column w.r.t. Sales per person  ##################################
@@ -156,6 +160,7 @@ plt.show()
 
 kmeans = KMeans(n_clusters=4, algorithm="elkan").fit(test)
 centroids = kmeans.cluster_centers_
+labels = kmeans.labels_
 inertia = kmeans.inertia_ #Sum of squared distances of samples to their closest cluster center, weighted by the sample weights if provided.
 
 print(centroids)
@@ -167,3 +172,51 @@ plt.show()
 
 
 
+############################   KPI and Numerical Analysis    ##################################
+
+
+K_means_dvs=metrics.davies_bouldin_score(test, cluster_index)
+K_means_si=metrics.silhouette_score(test, cluster_index, metric='euclidean')
+K_means_chi=metrics.calinski_harabasz_score(test, cluster_index)
+
+
+SOM_dvs=metrics.davies_bouldin_score(test, labels)
+SOM_si=metrics.silhouette_score(test, labels, metric='euclidean')
+SOM_chi=metrics.calinski_harabasz_score(test, labels)
+
+
+
+print(f'Davies-Bouldin Index: SOM_dvs={SOM_dvs} & K_means_dvs={K_means_dvs}')
+print(f'Silhouette Coefficient: SOM_si={SOM_si} & K_means_si={K_means_si}')
+print(f'Calinski-Harabasz Index: SOM_chi={SOM_chi} & K_means_chi={K_means_chi}')
+
+# Davies-Bouldin Index: SOM_dvs=0.7869547436438555 & K_means_dvs=4.095046246890271
+# Silhouette Coefficient: SOM_si=0.42874949024853665 & K_means_si=0.04004837828245745
+# Calinski-Harabasz Index: SOM_chi=828.0990947535752 & K_means_chi=271.7028326944662
+
+plt.title("Davies-Bouldin Index")
+x = ['SOM', 'K-Means']
+y   = [SOM_dvs, K_means_dvs]
+plt.bar(x, y, width=0.50, edgecolor='k', linewidth=2, align='center', color='green')
+plt.xlabel("Clustering Type")
+plt.ylabel("Score")
+plt.yticks(ticks=[x * 1 for x in range(10)])
+plt.show()
+
+plt.title("Silhouette Coefficient")
+x = ['SOM', 'K-Means']
+y   = [SOM_si, K_means_si]
+plt.bar(x, y, width=0.50, edgecolor='k', linewidth=2, align='center')
+plt.xlabel("Clustering Type")
+plt.ylabel("Score")
+plt.yticks(ticks=[x * 0.1 for x in range(10)])
+plt.show()
+
+plt.title("Calinski-Harabasz Index")
+x = ['SOM', 'K-Means']
+y   = [SOM_chi, K_means_chi]
+plt.bar(x, y, width=0.50, edgecolor='k', linewidth=2, align='center', color='blue')
+plt.xlabel("Clustering Type")
+plt.ylabel("Score")
+plt.yticks(ticks=[x * 100 for x in range(10)])
+plt.show()
